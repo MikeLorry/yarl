@@ -25,6 +25,7 @@ def main():
     hero = Hero()
     surf_hero_name = font_comic.render(hero.name, True, (200, 255, 200))
     img_hero = pygame.image.load(hero.avatar).convert()
+    img_heart = pygame.image.load("heart.gif").convert()
 
     while True:
         for event in pygame.event.get():
@@ -34,6 +35,10 @@ def main():
         screen.blit(img_background, [0, 0])
         screen.blit(surf_hero_name,(10,10))
         screen.blit(img_hero, [100, 100])
+        surf_life = pygame.Surface((hero.max_life * 16, 16))
+        for i in range(hero.life):
+            surf_life.blit(img_heart,(i*16,0))
+        screen.blit(surf_life, [130, 10])
         pygame.display.update()
 
 main()
