@@ -1,5 +1,6 @@
-import pygame
 import sys
+import ui
+import pygame
 from pygame.locals import *
 from hero import Hero
 
@@ -7,38 +8,40 @@ def main():
     # initialize game engine
     pygame.init()
 
-    # Init fonts
-    pygame.font.init()
-    font_comic = pygame.font.SysFont('Comic Sans MS', 30)
-
     # Setup main window
     window_width=400
     window_height=300
-    size = (window_width, window_height)
-    screen = pygame.display.set_mode(size)
+    screen = pygame.display.set_mode((window_width, window_height))
     pygame.display.set_caption("N.E.R.D.S.")
-
-    # Load background image
-    img_background = pygame.image.load("dungeon.jpg").convert()
 
     # Initialize Hero
     hero = Hero()
-    surf_hero_name = font_comic.render(hero.name, True, (200, 255, 200))
-    img_hero = pygame.image.load(hero.avatar).convert()
-    img_heart = pygame.image.load("heart.gif").convert()
 
+    # Example of event handling
     while True:
         for event in pygame.event.get():
             if event.type == QUIT:
                 pygame.quit()
                 sys.exit()
-        screen.blit(img_background, [0, 0])
-        screen.blit(surf_hero_name,(10,10))
-        screen.blit(img_hero, [100, 100])
-        surf_life = pygame.Surface((hero.max_life * 16, 16))
-        for i in range(hero.life):
-            surf_life.blit(img_heart,(i*16,0))
-        screen.blit(surf_life, [130, 10])
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_LEFT:
+                    hero.pos_x -= 50
+                if event.key == pygame.K_RIGHT:
+                    hero.pos_x += 50
+                if event.key == pygame.K_UP:
+                    hero.pos_y -= 50
+                if event.key == pygame.K_DOWN:
+                    hero.pos_y += 50
+        # Draw UI
+        for item in ui.get_ui_items(hero):
+            screen.blit(item[0],item[1])
+
+        # Draw characters
+        screen.blit(hero.img, [hero.pos_x, hero.pos_y])
+        alien_img = pygame.image.load("spirit.png").convert_alpha()
+        screen.blit(alien_img, [185,110])
+
+        # Update display at every frame
         pygame.display.update()
 
 main()

@@ -1,4 +1,5 @@
 import names
+import pygame
 
 class Hero:
     """Common class for Heroes"""
@@ -9,6 +10,9 @@ class Hero:
         self.avatar = "robot.png"
         self.max_life = 10
         self.life = self.max_life
+        self.pos_x = 69
+        self.pos_y = 83
+        self.img = pygame.image.load(self.avatar).convert_alpha()
         print(self.name + " just entered")
         print("All systems operational")
 
