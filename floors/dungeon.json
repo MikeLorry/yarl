@@ -1,0 +1,8 @@
+{
+    "name": "Dungeon1",
+    "background": "floors/dungeon.jpg",
+    "map": "floors/dungeon.map",
+    "origin": "19:33",
+    "tile_size": 50,
+    "spawn": "1:0"
+}
