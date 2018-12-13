@@ -1,19 +1,37 @@
 import sys
+import random
 import ui
 import pygame
 from pygame.locals import *
 from hero import Hero
 from floor import Floor
+from ennemy import Ennemy
 
-def set_position(floor, entity, next_loc):
+def set_position(entity, floor):
+    entity.pos_x = floor.origin[0] + (entity.loc_x * floor.tile_size)
+    entity.pos_y = floor.origin[1] + (entity.loc_y * floor.tile_size)
+    return
+
+def set_loc(floor, entity, ennemies, next_loc):
     if next_loc[0] in list(range(len(floor.map))):
         if next_loc[1] in list(range(len(floor.map[next_loc[0]]))):
             if floor.map[next_loc[0]][next_loc[1]] == 1:
-                entity.loc_x = next_loc[0]
-                entity.loc_y = next_loc[1]
-                entity.pos_x = floor.origin[0] + (entity.loc_x * floor.tile_size)
-                entity.pos_y = floor.origin[1] + (entity.loc_y * floor.tile_size)
+                ennemies_loc = [(e.loc_x,e.loc_y) for e in ennemies]
+                if (next_loc[0],next_loc[1]) not in ennemies_loc:
+                    entity.loc_x = next_loc[0]
+                    entity.loc_y = next_loc[1]
     return
+
+def get_ennemy_spawn(floor, ennemies, hero):
+    locs = []
+    for i in range(len(floor.map)):
+        for j in range(len(floor.map[i])):
+            if floor.map[i][j] == 1:
+                locs.append((i,j))
+    ennemies_loc = [(e.loc_x,e.loc_y) for e in ennemies]
+    locs = [l for l in locs if l not in ennemies_loc and l != (hero.loc_x,hero.loc_y)]
+    loc = random.choice(locs)
+    return loc
 
 def main():
     # initialize game engine
@@ -31,7 +49,17 @@ def main():
     print(hero.name + " just entered " + floor.name)
     hero.loc_x = floor.spawn[0]
     hero.loc_y = floor.spawn[1]
-    set_position(floor,hero,[hero.loc_x,hero.loc_y])
+    set_position(hero,floor)
+
+    # Initialize ennemies
+    nb_ennemies = 1
+    ennemies = []
+    for ennemy in range(nb_ennemies):
+        ennemies.append(Ennemy())
+        loc = get_ennemy_spawn(floor, ennemies, hero)
+        ennemies[-1].loc_x = loc[0]
+        ennemies[-1].loc_y = loc[1]
+        set_position(ennemies[-1], floor)
 
     # Example of event handling
     while True:
@@ -49,14 +77,15 @@ def main():
                     next_loc[1] -= 1
                 if event.key == pygame.K_DOWN:
                     next_loc[1] += 1
-                set_position(floor,hero,next_loc)
+                set_loc(floor,hero,ennemies,next_loc)
+                set_position(hero,floor)
 
         # Get all items to blit
         blits = floor.get_blits()
         blits += ui.get_blits()
         blits += hero.get_blits()
-        alien_img = pygame.image.load("assets/spirit.png").convert_alpha()
-        blits.append((alien_img, [185,110]))
+        for ennemy in ennemies:
+            blits += ennemy.get_blits()
 
         # Blit and update display at every frame
         for item in blits:
